@@ -1,34 +1,21 @@
 import requests
 import io
 import base64
-from PIL import Image, PngImagePlugin
-from threading import Thread
-from requests import get, post, put, patch, delete, options, head
+from PIL import Image
 import streamlit as st
-from streamlit.runtime.scriptrunner import add_script_run_ctx
 import time
+from functions import async_request,init_state_var
+from os import getenv
+from dotenv import load_dotenv
 
-request_methods = {
-    "get": get,
-    "post": post,
-    "put": put,
-    "patch": patch,
-    "delete": delete,
-    "options": options,
-    "head": head,
-}
-
-url = "http://127.0.0.1:7861"
+load_dotenv()
 timeout = 180
-
+url=getenv('url_txt2img')
 
 if "images" not in st.session_state:
     st.session_state["images"] = []
 
 
-def init_state_var(var, val):
-    if not st.session_state.get(var):
-        st.session_state[var] = val
 
 
 init_state_var("steps", 25)
@@ -36,25 +23,6 @@ init_state_var("seed", -1)
 init_state_var("numimgs", 4)
 init_state_var("images",[])
 init_state_var("info",[])
-
-
-
-
-def async_request(method, *args, callback=None, timeout=180, **kwargs):
-    """Makes request on a different thread, and optionally passes response to a
-    `callback` function when request returns.
-    """
-    method = request_methods[method.lower()]
-    if callback:
-
-        def callback_with_args(response, *args, **kwargs):
-            callback(response)
-
-        kwargs["hooks"] = {"response": callback_with_args}
-    kwargs["timeout"] = timeout
-    thread = Thread(target=method, args=args, kwargs=kwargs)
-    add_script_run_ctx(thread)
-    thread.start()
 
 
 def show_images(r):
@@ -66,7 +34,7 @@ def show_images(r):
             image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
             st.session_state.images.append(image)
 
-st.markdown('<div style="text-align: center;color:#DC901D;font-size:60px;vertical-align:top;">Nymble AI</div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align: center;color:#A472FB;font-size:60px;vertical-align:top;">Nymble AI </div>', unsafe_allow_html=True)
 st.sidebar.subheader("Enter a prompt to generate images")
 prompt_input = st.sidebar.text_input(
     placeholder="describe your desired image here",
@@ -156,7 +124,7 @@ with placeholder.container():
         )
         st.empty()
     else:
-        st.markdown('<div style="text-align: center;font-size:18px;vertical-align:top;">Custom trained text to image generator</div>', unsafe_allow_html=True)
+        st.markdown('<div style="text-align: center;font-size:18px;vertical-align:top;">Custom Trained Text To Image Neural Network</div>', unsafe_allow_html=True)
         
 
 # # body={{
