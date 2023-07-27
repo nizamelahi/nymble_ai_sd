@@ -4,25 +4,55 @@ import base64
 from PIL import Image
 import streamlit as st
 import time
-from functions import async_request,init_state_var
+from functions import async_request, init_state_var
 from os import getenv
 from dotenv import load_dotenv
 
+hide_streamlit_style = """
+                <style>
+                div[data-testid="stToolbar"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                div[data-testid="stDecoration"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                div[data-testid="stStatusWidget"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                #MainMenu {
+                visibility: hidden;
+                height: 0%;
+                }
+                header {
+                visibility: hidden;
+                height: 0%;
+                }
+                footer {
+                visibility: hidden;
+                height: 0%;
+                }
+                </style>
+                """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 load_dotenv()
 timeout = 180
-url=getenv('url_txt2img')
+url = getenv("url_txt2img")
 
 if "images" not in st.session_state:
     st.session_state["images"] = []
 
 
-
-
 init_state_var("steps", 25)
 init_state_var("seed", -1)
 init_state_var("numimgs", 4)
-init_state_var("images",[])
-init_state_var("info",[])
+init_state_var("images", [])
+init_state_var("info", [])
 
 
 def show_images(r):
@@ -34,7 +64,11 @@ def show_images(r):
             image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
             st.session_state.images.append(image)
 
-st.markdown('<div style="text-align: center;color:#A472FB;font-size:60px;vertical-align:top;">Nymble AI </div>', unsafe_allow_html=True)
+
+st.markdown(
+    '<div style="text-align: center;color:#A472FB;font-size:60px;vertical-align:top;">Nymble AI </div>',
+    unsafe_allow_html=True,
+)
 st.sidebar.subheader("Enter a prompt to generate images")
 prompt_input = st.sidebar.text_input(
     placeholder="describe your desired image here",
@@ -69,9 +103,8 @@ with st.sidebar.expander("advanced options"):
     numimgs = st.number_input(
         label="number of images", key="numimgs", value=st.session_state.numimgs
     )
-    
 
-    generatebutton = st.sidebar.button("Generate images",type="primary")
+    generatebutton = st.sidebar.button("Generate images", type="primary")
 placeholder = st.empty()
 
 if generatebutton:
@@ -124,8 +157,11 @@ with placeholder.container():
         )
         st.empty()
     else:
-        st.markdown('<div style="text-align: center;font-size:18px;vertical-align:top;">Custom Trained Text To Image Neural Network</div>', unsafe_allow_html=True)
-        
+        st.markdown(
+            '<div style="text-align: center;font-size:18px;vertical-align:top;">Custom Trained Text To Image Neural Network</div>',
+            unsafe_allow_html=True,
+        )
+
 
 # # body={{
 # #   "enable_hr": false,

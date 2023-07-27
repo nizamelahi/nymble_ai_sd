@@ -3,7 +3,40 @@ from functions import async_request,init_state_var
 import time
 from os import getenv
 from dotenv import load_dotenv
+
 st.set_page_config(layout="wide")
+hide_streamlit_style = """
+                <style>
+                div[data-testid="stToolbar"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                div[data-testid="stDecoration"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                div[data-testid="stStatusWidget"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                #MainMenu {
+                visibility: hidden;
+                height: 0%;
+                }
+                header {
+                visibility: hidden;
+                height: 0%;
+                }
+                footer {
+                visibility: hidden;
+                height: 0%;
+                }
+                </style>
+                """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
 load_dotenv()
 timeout = 2
@@ -48,6 +81,8 @@ if generatebutton:
                     time.sleep(1)
                     if len(st.session_state.results) > 0:
                         break
+                if seconds == timeout-1:
+                    st.error("something went wrong :(")
     else:
         st.error("please enter prompt")
 
