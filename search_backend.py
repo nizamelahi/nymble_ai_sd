@@ -2,10 +2,10 @@ from os import getenv
 from dotenv import load_dotenv
 from flask import Flask,request
 from semantic_search.semantic_search import search,initialise
-load_dotenv
+load_dotenv()
 # creating a Flask app
 app = Flask(__name__)
-datafile = getenv("processed_data")
+datafile = getenv('processed_data')
 
 df,model=initialise(datafile)
 print("search engine ready")
