@@ -1,4 +1,3 @@
-from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 from InstructorEmbedding import INSTRUCTOR
 import pickle

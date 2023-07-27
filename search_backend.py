@@ -1,6 +1,6 @@
 from os import getenv
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask,request
 from semantic_search.semantic_search import search,initialise
 load_dotenv
 # creating a Flask app
