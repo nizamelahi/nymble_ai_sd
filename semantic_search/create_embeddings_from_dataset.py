@@ -3,7 +3,7 @@ from InstructorEmbedding import INSTRUCTOR
 from datetime import datetime
 import pickle
 
-input_datapath = "data/report.csv"
+input_datapath = "data/report_large.csv"
 outfile_path="data/stored_embeddings_jobs.pkl"
 
 df = pd.read_csv(input_datapath,delimiter=";")
