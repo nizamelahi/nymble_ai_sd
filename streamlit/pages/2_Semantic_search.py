@@ -3,8 +3,12 @@ from functions import async_request,init_state_var
 import time
 from os import getenv
 from dotenv import load_dotenv
-
-st.set_page_config(layout="wide")
+st.set_page_config(
+   page_title="Nymble AI Semantic Search",
+   page_icon="🤖",
+   layout="wide",
+   initial_sidebar_state="expanded",
+)
 hide_streamlit_style = """
                 <style>
                 div[data-testid="stToolbar"] {
