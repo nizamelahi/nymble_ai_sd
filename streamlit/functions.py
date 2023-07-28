@@ -29,5 +29,5 @@ def async_request(method, *args, callback=None, timeout=180, **kwargs):
     thread.start()
 
 def init_state_var(var, val):
-    if not st.session_state.get(var):
+    if st.session_state.get(var) == None:
         st.session_state[var] = val

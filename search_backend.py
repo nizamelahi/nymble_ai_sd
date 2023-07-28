@@ -14,7 +14,7 @@ print("search engine ready")
 
 @app.route("/search", methods=["GET", "POST"])
 def searchpage():
-    return search(df, request.json.get("query"), model)
+    return search(df, model=model,query=request.json.get("query"),page=request.json.get("page"))
 
 
 # driver function
