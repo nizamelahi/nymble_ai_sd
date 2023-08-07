@@ -140,8 +140,6 @@ with c:
         if nb:
             nextpage()
             st.experimental_rerun()
-
-print(st.session_state.last_page)
 with content.container():
     if len(st.session_state.get("results")) > 0:
         for result, link in zip(st.session_state.results, st.session_state.links):
@@ -159,18 +157,7 @@ with content.container():
                 st.write(f"[{link[:50]}...]({link})")
             st.text(" ")
             st.text(" ")
-        # a, b, c = st.columns(3)
-        # with a:
-        #     if st.session_state.page > 1:
-        #         st.button("previous", on_click=prevpage,args=())
-        # with b:
-        #     if len(st.session_state.get("results")) > 0:
-        #         st.text(f"page{st.session_state.page}")
-        # with c:
-        #     if not st.session_state.last_page:
-        #         st.button("next", on_click=nextpage,args=())
 
-        print(st.session_state.last_page)
 
     else:
         content.empty()

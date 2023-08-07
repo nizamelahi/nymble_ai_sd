@@ -13,8 +13,7 @@ with open(datafile, "rb") as f:
 model = INSTRUCTOR("hkunlp/instructor-large")
 
 
-# search through the reviews for a specific product
-def search_reviews(df, product_description, n=3, pprint=True):
+def search(df, product_description, n=3, pprint=True):
     product_embedding = model.encode(
         [["represent the sentence for retrieval", product_description]],
         normalize_embeddings=True,
@@ -44,7 +43,7 @@ def search_reviews(df, product_description, n=3, pprint=True):
     return ({"links":links,"descriptions":descriptions})
 
 
-jobs= search_reviews(df, "google", n=15)
+jobs= search(df, "google", n=15)
 links=jobs["links"]
 descriptions=jobs["descriptions"]
 for l,d in zip(links,descriptions):
