@@ -37,7 +37,7 @@ def results_from_resume(df_data,model,in_file):
         global pc
         pc+=1
         progress=(pc/len(sentences))/2
-        return  model.encode(x,normalize_embeddings=True,show_progress_bar=True)
+        return  model.encode(x,normalize_embeddings=True)
 
 
     df["embeddings"] = df.sentences.apply(encfunc,args=(model,))

@@ -101,7 +101,7 @@ def get_recommendations():
                 else:
                     try:
                         prog = requests.get(
-                            url + "/progress", timeout=2
+                            url + "/progress", timeout=5
                         ).json()
                         st.progress(float(prog.get("progress")), text="Processing resume,please wait...")
 
@@ -164,13 +164,13 @@ with a:
             st.experimental_rerun()
 with b:
     if len(st.session_state.get("results")) > 0:
-        if st.session_state.last_page_num != st.session_state.pages:
+        if st.session_state.page != st.session_state.last_page_num:
             st.text(f"Page{st.session_state.page}")
         else:
             st.text(f"Last Page")
 
 with c:
-    if st.session_state.last_page_num != st.session_state.pages:
+    if st.session_state.page != st.session_state.last_page_num:
         nb = st.button("Next")
         if nb:
             nextpage()
