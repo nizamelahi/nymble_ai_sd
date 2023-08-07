@@ -103,6 +103,7 @@ def get_recommendations():
                         prog = requests.get(
                             url + "/progress", timeout=5
                         ).json()
+                        print(prog.get("progress"))
                         st.progress(float(prog.get("progress")), text="Processing resume,please wait...")
 
                     except:
