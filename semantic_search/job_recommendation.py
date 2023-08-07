@@ -59,6 +59,7 @@ def results_from_resume(df_data,model,in_file):
     links=[]
     desc=[]
     pc=0
+    progress=0
     for i in important:
         pc+=1
         new=(search(df_data, model=model,query=i,n=99999))
