@@ -18,7 +18,7 @@ def results_from_resume(df_data,model,in_file):
        pdf+=page.get_text()
     doc.close()
 
-    sentences=pdf.split(".")
+    sentences=pdf.split("\n")
     for i,sentence in enumerate(sentences):
         words=sentence.split(" ")
         for idx,word in enumerate(words):
