@@ -106,8 +106,8 @@ def get_recommendations():
                         print(prog.get("progress"))
                         st.progress(float(prog.get("progress")), text="Processing resume,please wait...")
 
-                    except:
-                        break
+                    except Exception as e:
+                        print(e)
                 if seconds == timeout - 1:
                     st.error("something went wrong :(")
     else:
