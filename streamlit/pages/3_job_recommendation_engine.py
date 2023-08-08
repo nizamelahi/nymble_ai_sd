@@ -67,9 +67,9 @@ def show_results(r):
     st.session_state.all_data = pd.DataFrame(
         r.get("output"), columns=["links", "description", "count"]
     )
-    st.session_state.all_data = st.session_state.all_data.sort_values(
-        "count", ascending=False
-    )
+    # st.session_state.all_data = st.session_state.all_data.sort_values(
+    #     "count", ascending=False
+    # )
     st.session_state.results = (
         st.session_state.all_data["description"].head(num_results).tolist()
     )
@@ -78,9 +78,12 @@ def show_results(r):
     )
     st.session_state.pages = len(st.session_state.all_data) / num_results
     if (len(st.session_state.all_data) % num_results) == 0:
-        st.session_state.last_page_num = st.session_state.pages
+        st.session_state.last_page_num = st.session_state.pages      
     else:
-        st.session_state.last_page_num = st.session_state.pages + 1
+        if  (len(st.session_state.all_data) < num_results):
+            st.session_state.last_page_num =1 
+        else :
+            st.session_state.last_page_num = st.session_state.pages + 1
 
 
 def get_recommendations():
@@ -93,23 +96,22 @@ def get_recommendations():
             files={"file":st.session_state.infile},
             callback=lambda r: show_results(r.json()),
         )
-        for seconds in range(timeout):
-            with content.container():
-                time.sleep(1)
-                if len(st.session_state.results) > 0:
-                    break
-                else:
-                    try:
-                        prog = requests.get(
-                            url + "/progress", timeout=5
-                        ).json()
-                        print(prog.get("progress"))
-                        st.progress(float(prog.get("progress")), text="Processing resume,please wait...")
-
-                    except Exception as e:
-                        print(e)
-                if seconds == timeout - 1:
-                    st.error("something went wrong :(")
+        with content.container():
+            with st.spinner("Processing resume,please wait..."):
+                for seconds in range(timeout):
+                    time.sleep(1)
+                    if len(st.session_state.results) > 0 :
+                        break
+                    else:
+                        try:
+                            prog = requests.get(
+                                url + "/progress", timeout=5
+                            ).json()
+                            print(prog.get("progress"))
+                        except Exception as e:
+                            st.error(e)
+                    if seconds == timeout - 1:
+                        st.error("something went wrong :(")
     else:
         st.error("please upload a file")
 

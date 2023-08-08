@@ -1,82 +1,107 @@
 from sentence_transformers.util import cos_sim
-from sentence_transformers import SentenceTransformer
 import pandas as pd
 import fitz
 from semantic_search.semantic_search import search
+from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.corpus import stopwords
+import nltk
+import string
 
-threshold = 0.81
-allowed=[",","."]
-garbage=["skills","details","experience"]
-progress=0.2
-pc=0
+nltk.download("stopwords")
 
-def results_from_resume(df_data,model,in_file):
+threshold = 0.75
+allowed = [",", "."]
+garbage = ["skills", "details", "experience","engineer","engineering","designer","design","technical","linkedin","build","driving","resume","templates","pinterest","template","developer","development","January", "February", "March", "April", "May", "June", "July","August", "September", "October", "November", "December","included","company"] + stopwords.words("english")
+progress = 0.0
+pc = 0
+
+
+def remove_garbage(x):
+    if x in garbage:
+        return ""
+    else:
+        return x
+
+
+def results_from_resume(df_data, model, in_file):
     global progress
-    doc = fitz.open(stream=in_file["file"].read(),filetype="pdf")
+    global pc
+    progress = 0.0
+    pc = 0
+    doc = fitz.open(stream=in_file["file"].read(), filetype="pdf")
     pdf = ""
     for page in doc:
-       pdf+=page.get_text()
+        pdf += page.get_text()
     doc.close()
 
-    sentences=pdf.split("\n")
-    for i,sentence in enumerate(sentences):
-        words=sentence.split(" ")
-        for idx,word in enumerate(words):
-            if (len(word) == 1 and word not in allowed) or (word in garbage) :
-                words.pop(idx)
-        if words: 
-            sentences[i]=" ".join(words) 
-        else: 
-            sentences.pop(i)
+    trans_table = str.maketrans("", "", string.digits)
 
-    df=pd.DataFrame(sentences,columns =['sentences'])
-    df=df.dropna()
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform([pdf])
+    words = vectorizer.get_feature_names_out()
+    dense = vectors.todense()
+    importance = dense.tolist()
+    df = pd.DataFrame(list(zip(words, importance[0])), columns=["words", "importance"])
+    df["words"] = df.words.str.translate(trans_table)
+    df["words"] = df.words.apply(remove_garbage)
+    df.drop(df[df.words == ""].index, inplace=True)
 
-    def encfunc(x,model):
-        global progress
-        global pc
-        pc+=1
-        progress=(pc/len(sentences))/2
-        return  model.encode(x,normalize_embeddings=True)
+    df = df.sort_values("importance", ascending=False)
 
+    words = df.words.tolist()
+    sentences = []
+    temp = ""
+    for i,word in enumerate(words):
+        temp = temp + word + " "
+        if (i+1) % 20 == 0:
+            sentences.append(temp)
+            temp = ""
 
-    df["embeddings"] = df.sentences.apply(encfunc,args=(model,))
+    df = pd.DataFrame(sentences, columns=["words"])
 
-    query = model.encode(
-        "technologies,softwares,trades,talent,professional skills,hardware",
-        normalize_embeddings=True,
-    )
-    df["similarity"] = df.embeddings.apply(
-        lambda x: cos_sim(query, x)
-    )
+    # def encfunc(x, model):
+    #     global progress
+    #     global pc
+    #     pc += 1
+    #     progress = (pc / len(words)) / 2
+    #     return model.encode(x, normalize_embeddings=True)
 
-    results = df[df.similarity >= threshold]
+    # df["embeddings"] = df.words.apply(encfunc, args=(model,))
 
-    results = results.sort_values("similarity", ascending=False).head(20)
+    # query = model.encode(
+    #     "skills specialisations expertise abilities",
+    #     normalize_embeddings=True,
+    # )
+    # df["similarity"] = df.embeddings.apply(lambda x: cos_sim(query, x))
 
-    important=results.sentences.tolist()
+    # results = df[df.similarity >= threshold]
 
-    links=[]
-    desc=[]
-    pc=0
-    progress=0
+    # results = df.sort_values("similarity", ascending=False).head(20)
+
+    important = df.words.tolist()
+
+    links = []
+    desc = []
+    pc = 0
     for i in important:
-        pc+=1
-        new=(search(df_data, model=model,query=i,n=99999))
+        pc += 1
+        new = search(df_data, model=model, query=i, n=99999)
         links.extend(new["links"])
         desc.extend(new["descriptions"])
-        progress=0.5+((pc/len(important))/2)
-    resultdict={}
-    for i,link in enumerate(links):
+        progress = 0.5 + ((pc / len(important)) / 2)
+    resultdict = {}
+    for i, link in enumerate(links):
         if link == " ":
             continue
-        if(resultdict.get(link)):
-            resultdict[link]["count"]+=1
+        if resultdict.get(link):
+            resultdict[link]["count"] += 1
         else:
-            resultdict[link]={"description":desc[i],"count":1}
-    
-    output=[]
+            resultdict[link] = {"description": desc[i], "count": 1}
+
+    output = []
     for link in resultdict:
-        output.append([link,resultdict[link]["description"],resultdict[link]["count"]])
-    
-    return {"output":output}
+        output.append(
+            [link, resultdict[link]["description"], resultdict[link]["count"]]
+        )
+
+    return {"output": output}
