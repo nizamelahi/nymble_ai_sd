@@ -3,7 +3,7 @@ from sentence_transformers import SentenceTransformer
 import pickle
 
 
-threshold = 0.81
+threshold = 0.82
 # read the pickle file
 def initialise(filename):
     with open(filename, "rb") as f:

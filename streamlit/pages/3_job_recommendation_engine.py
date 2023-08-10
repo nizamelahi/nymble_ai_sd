@@ -49,21 +49,31 @@ load_dotenv()
 timeout = 20
 url = getenv("url_semantic_search")
 def load_results():
+    if st.session_state.page == st.session_state.last_page_num:
+        tail_res=len(st.session_state.all_data["description"])-((st.session_state.page-1)*num_results)
+    else:
+        tail_res=num_results
+
     st.session_state.results = (
         st.session_state.all_data["description"]
         .head(num_results * st.session_state.page)
-        .tail(num_results)
+        .tail(tail_res)
         .tolist()
     )
     st.session_state.links = (
         st.session_state.all_data["links"]
         .head(num_results * st.session_state.page)
-        .tail(num_results)
+        .tail(tail_res)
         .tolist()
     )
-
+    
 
 def show_results(r):
+    try:
+        r=r.json()
+    except :
+        st.error("an error occured")
+
     st.session_state.all_data = pd.DataFrame(
         r.get("output"), columns=["links", "description", "count"]
     )
@@ -76,14 +86,16 @@ def show_results(r):
     st.session_state.links = (
         st.session_state.all_data["links"].head(num_results).tolist()
     )
-    st.session_state.pages = len(st.session_state.all_data) / num_results
-    if (len(st.session_state.all_data) % num_results) == 0:
-        st.session_state.last_page_num = st.session_state.pages      
+    
+    if (len(st.session_state.all_data["description"]) % num_results) == 0:
+        st.session_state.pages = len(st.session_state.all_data["description"]) / num_results     
     else:
-        if  (len(st.session_state.all_data) < num_results):
+        if  (len(st.session_state.all_data["description"]) < num_results):
             st.session_state.last_page_num =1 
         else :
-            st.session_state.last_page_num = st.session_state.pages + 1
+            st.session_state.pages = int((len(st.session_state.all_data["description"])) / num_results) +1
+
+    st.session_state.last_page_num = st.session_state.pages
 
 
 def get_recommendations():
@@ -94,7 +106,7 @@ def get_recommendations():
             "get",
             url + "/job_recommendations",
             files={"file":st.session_state.infile},
-            callback=lambda r: show_results(r.json()),
+            callback=lambda r: show_results(r),
         )
         with content.container():
             with st.spinner("Processing resume,please wait..."):

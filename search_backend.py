@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, request
 from semantic_search.semantic_search import search, initialise
 # from semantic_search.job_recommendation import results_from_resume
-import semantic_search.job_recommendation
+import semantic_search.alt_algo
 
 load_dotenv()
 # creating a Flask app
@@ -20,11 +20,11 @@ def searchpage():
 
 @app.route("/job_recommendations", methods=["GET"])
 def resumeupload():
-    return semantic_search.job_recommendation.results_from_resume(df_data=df, model=model,in_file=request.files)
+    return semantic_search.alt_algo.results_from_resume(df_data=df, model=model,in_file=request.files)
 
 @app.route("/progress", methods=["GET"])
 def prg():
-    return {"progress":semantic_search.job_recommendation.progress}
+    return {"progress":semantic_search.alt_algo.progress}
 
 # driver function
 if __name__ == "__main__":
